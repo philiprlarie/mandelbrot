@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Mandelbrot</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+  </head>
+  <body>
+    <button type="button" name="cool-pt-1">Spirals</button>
+
+    <form id="mandelbrot-input">
+      Center X:
+      <input type="text" name="centerx" value="-0.75"><br/>
+      Center Y:
+      <input type="text" name="centery" value="0"><br/>
+      Zoom:
+      <input type="text" name="zoom" value="1"><br/>
+      Iterations:
+      <input type="text" name="iterations" value="50"><br/>
+      Width:
+      <input type="text" name="canvas-width" value="50"><br/>
+      Height:
+      <input type="text" name="canvas-height" value="50"><br/>
+      Sharpness:
+      <input type="text" name="sharpness" value="2"><br/>
+      <input type="submit">
+    </form>
+    <canvas id="canvas" width="500" height="500"></canvas>
+    <script type="text/javascript" src="./mandelbrot.js"></script>
+    <script type="text/javascript" src="./draw-mandelbrot.js"></script>
+  </body>
+</html>
