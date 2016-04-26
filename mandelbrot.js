@@ -6,11 +6,18 @@ function Mandelbrot (centerX, centerY, width, height, zoom, iterations) {
   this.centerY = centerY; // imaginary number component for center of zoom
   this.width = width; // width in pixels of output picture
   this.height = height; // height in pixels of output picture
-  this.zoom = zoom || 1; // default zoom corresponds to 1000px per unit
+  this.zoom = zoom || 1; // default zoom corresponds to 4 units on x axis
   this.iterations = iterations; // max iterations of mandelbrot function
 
-  this.grid = new Array(this.height); // create grid with spot for each pixel
+  this.coordGrid = new Array(this.height); // grid of coordinates
   var i = 0;
+  while (i < this.height) {
+    this.coordGrid[i] = new Array(this.width);
+    i++;
+  }
+
+  this.grid = new Array(this.height); // grid of mandelbrot escape values
+  i = 0;
   while (i < this.height) {
     this.grid[i] = new Array(this.width);
     i++;
@@ -30,7 +37,7 @@ var setPointValues = function (mandelbrot) {
     real = mandelbrot.centerX + (i - mandelbrot.width / 2) / mandelbrot.zoom / UNIT_PIXEL_SCALING;
     while (j < mandelbrot.height) {
       imaginary = mandelbrot.centerY + (j - mandelbrot.height / 2) / mandelbrot.zoom / UNIT_PIXEL_SCALING;
-      mandelbrot.grid[j][i] = [real, imaginary];
+      mandelbrot.coordGrid[j][i] = [real, imaginary];
       j++;
     }
     i++;
@@ -45,7 +52,7 @@ var setMandelbrotValues = function (mandelbrot) {
   while (i < mandelbrot.width) {
     j = 0;
     while (j < mandelbrot.height) {
-      mandelbrot.grid[j][i] = mandelbrotIterate(mandelbrot.grid[j][i], mandelbrot.iterations);
+      mandelbrot.grid[j][i] = mandelbrotIterate(mandelbrot.coordGrid[j][i], mandelbrot.iterations);
       j++;
     }
     i++;
