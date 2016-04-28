@@ -67,7 +67,7 @@ var mandelbrotIterate = function (point, maxIterations) {
   var imaginary = 0;
 
   var i = 0;
-  while (i <= maxIterations) {
+  while (i < maxIterations) {
     newReal = startReal + real * real - imaginary * imaginary;
     newImaginary = startImaginary + 2 * real * imaginary;
     real = newReal;

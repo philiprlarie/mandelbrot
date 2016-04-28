@@ -14,11 +14,12 @@ $('#canvas').click(function (e) {
   var unitCoords = window.mandelbrot.coordGrid[yClickCoord][xClickCoord];
   $('#mandelbrot-input input[name=centerx]').val(unitCoords[0]);
   $('#mandelbrot-input input[name=centery]').val(unitCoords[1]);
+  var oldZoom;
   if (e.shiftKey) {
-    var oldZoom = parseFloat($('#mandelbrot-input input[name=zoom]').val());
+    oldZoom = parseFloat($('#mandelbrot-input input[name=zoom]').val());
     $('#mandelbrot-input input[name=zoom]').val(oldZoom * 2);
   } else if (e.altKey) {
-    var oldZoom = parseFloat($('#mandelbrot-input input[name=zoom]').val());
+    oldZoom = parseFloat($('#mandelbrot-input input[name=zoom]').val());
     $('#mandelbrot-input input[name=zoom]').val(oldZoom / 2);
   }
   $('#mandelbrot-input').submit();
