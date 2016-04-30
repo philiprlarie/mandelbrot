@@ -60,24 +60,53 @@ var setMandelbrotValues = function (mandelbrot) {
 };
 
 // Given a point, iterate the mandelbrot function until point has magnitude > 2 or max iterations. If we meet max itarations, assume point will never escape
+
+// simple escape calculation
+// var mandelbrotIterate = function (point, maxIterations) {
+//   var escapeRadius = 2;
+//   var startReal = point[0];
+//   var startImaginary = point[1];
+//   var real = 0;
+//   var imaginary = 0;
+//
+//   var i = 0;
+//   while (i < maxIterations) {
+//     tempReal = startReal + real * real - imaginary * imaginary;
+//     tempImaginary = startImaginary + 2 * real * imaginary;
+//     real = tempReal;
+//     imaginary = tempImaginary;
+//
+//     if (real * real + imaginary * imaginary > escapeRadius * escapeRadius) {
+//       return i;
+//     }
+//     i++;
+//   }
+//   return Infinity;
+// };
+
+// smooth escape calculation
 var mandelbrotIterate = function (point, maxIterations) {
+  var escapeRadius = 20000;
   var startReal = point[0];
   var startImaginary = point[1];
   var real = 0;
   var imaginary = 0;
 
+  var tempReal, tempImaginary;
   var i = 0;
   while (i < maxIterations) {
-    newReal = startReal + real * real - imaginary * imaginary;
-    newImaginary = startImaginary + 2 * real * imaginary;
-    real = newReal;
-    imaginary = newImaginary;
+    tempReal = startReal + real * real - imaginary * imaginary;
+    tempImaginary = startImaginary + 2 * real * imaginary;
+    real = tempReal;
+    imaginary = tempImaginary;
 
-    if (real * real + imaginary * imaginary > 4) {
-      return i;
-    } else {
+    if (real * real + imaginary * imaginary > escapeRadius * escapeRadius) {
+      break;
     }
     i++;
   }
-  return Infinity;
+
+  if (real * real + imaginary * imaginary < 2 * 2 * 2 * 2) { return 0; }
+  var mu = (i - Math.log(Math.log(real * real + imaginary * imaginary) / 2) / Math.log(2)) / maxIterations;
+  return Math.sqrt(mu);
 };
