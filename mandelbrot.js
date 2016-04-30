@@ -1,5 +1,3 @@
-window.Mandelbrot = Mandelbrot;
-
 // The purpose of this function is to output a grid that corresponds to the number of iterations needed in the mandlebrot function for a points magitude to reach > 2
 function Mandelbrot (centerX, centerY, width, height, zoom, iterations) {
   this.centerX = centerX; // real number coordinate for center of zoom
@@ -110,3 +108,5 @@ var mandelbrotIterate = function (point, maxIterations) {
   var mu = (i - Math.log(Math.log(real * real + imaginary * imaginary) / 2) / Math.log(2)) / maxIterations;
   return Math.sqrt(mu);
 };
+
+module.exports = Mandelbrot;
