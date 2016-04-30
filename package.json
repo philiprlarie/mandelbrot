@@ -2,9 +2,10 @@
   "name": "mandelbrot",
   "version": "1.0.0",
   "description": "Express app that allows you to explore the Mandelbrot set!",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
-    "test": "test"
+    "start": "node app.js;",
+    "test": "test;"
   },
   "repository": {
     "type": "git",
@@ -18,5 +19,8 @@
   "bugs": {
     "url": "https://github.com/philiprlarie/mandelbrot/issues"
   },
-  "homepage": "https://github.com/philiprlarie/mandelbrot#readme"
+  "homepage": "https://github.com/philiprlarie/mandelbrot#readme",
+  "dependencies": {
+    "express": "^4.13.4"
+  }
 }
