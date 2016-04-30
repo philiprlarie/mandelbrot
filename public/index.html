@@ -6,23 +6,30 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
   </head>
   <body>
-    <button type="button" name="cool-pt-1">Spirals</button>
-    <form class="" action="index.html" method="post">
+    <div class="presets">
+      <h3>Checkout Some Cool Places</h3>
+      <button type="button" name="cool-pt-1">Spirals</button>
+    </div>
 
-    </form>
+    <h3>Or explore for yourself!</h3>
     <form id="mandelbrot-input">
       Center X:
-      <input type="text" name="centerx" value="-0.75"><br/>
+      <input type="text" name="centerX" value="-0.75"><br/>
       Center Y:
-      <input type="text" name="centery" value="0"><br/>
+      <input type="text" name="centerY" value="0"><br/>
+      Width:
+      <input type="text" name="width" value="150"><br/>
+      Height:
+      <input type="text" name="height" value="150"><br/>
       Zoom:
       <input type="text" name="zoom" value="1"><br/>
       Iterations:
       <input type="text" name="iterations" value="50"><br/>
-      Width:
-      <input type="text" name="canvas-width" value="150"><br/>
-      Height:
-      <input type="text" name="canvas-height" value="150"><br/>
+      <input type="submit">
+    </form>
+
+    <h3>Drawing Options</h3>
+    <form id="drawing-options">
       Sharpness:
       <input type="text" name="sharpness" value="2"><br/>
       Band Splits (Percent of pixels):

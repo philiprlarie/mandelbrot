@@ -8,13 +8,16 @@ var app = express();
 app.use(express.static('public'));
 
 app.post('/api/mandelbrot', parseUrlEncoded, function (req, res) {
-  var x = 0;
-  var y = 0;
-  var width = 200;
-  var height = 200;
-  var zoom = 0.25;
-  var iters = 500;
-  res.json(new Mandelbrot(x, y, width, height, zoom, iters));
+  // TODO: Form validator
+  var input = req.body;
+  res.json(new Mandelbrot(
+    input.centerX,
+    input.centerY,
+    input.width,
+    input.height,
+    input.zoom,
+    input.iterations
+  ));
 });
 
 app.listen(8000, function () {

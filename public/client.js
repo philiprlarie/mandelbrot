@@ -7,6 +7,7 @@ $(function () {
     $.ajax({
       type: 'POST',
       url: '/api/mandelbrot',
+      data: inputData,
       success: mandelbrotInputSuccessHandler,
       error: mandelbrotInputErrorHandler
     });
