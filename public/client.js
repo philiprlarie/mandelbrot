@@ -1,3 +1,5 @@
+var someshit = require('./click-mandelbrot.js');
+
 $(function () {
   $('#mandelbrot-input').on('submit', function (event) {
     event.preventDefault();
@@ -14,7 +16,7 @@ $(function () {
   });
 
   function mandelbrotInputSuccessHandler (data) {
-    console.log(data);
+    window.mandelbrot = data;
   }
 
   function mandelbrotInputErrorHandler (error) {

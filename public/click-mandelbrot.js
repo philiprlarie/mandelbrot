@@ -24,3 +24,5 @@ $('#canvas').click(function (e) {
   }
   $('#mandelbrot-input').submit();
 });
+
+module.exports = {someshit: 'this is'};

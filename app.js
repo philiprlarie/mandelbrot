@@ -1,9 +1,7 @@
 var express = require('express');
+var app = express();
 var parseUrlEncoded = require('body-parser').urlencoded({ extended: false });
 var Mandelbrot = require('./mandelbrot.js');
-
-var app = express();
-
 
 app.use(express.static('public'));
 
@@ -23,4 +21,5 @@ app.post('/api/mandelbrot', parseUrlEncoded, function (req, res) {
 app.listen(8000, function () {
   console.log('Example app listening on port 8000!');
 });
+
 module.exports = {};
