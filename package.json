@@ -4,7 +4,7 @@
   "description": "Express app that allows you to explore the Mandelbrot set!",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js;",
+    "start": "gulp build; node app.js;",
     "test": "test;"
   },
   "repository": {

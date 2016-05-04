@@ -1,27 +1,6 @@
-var someshit = require('./click-mandelbrot.js');
-
 $(function () {
-  $('#mandelbrot-input').on('submit', function (event) {
-    event.preventDefault();
-    var $form = $(this);
-    var inputData = $form.serialize();
-
-    $.ajax({
-      type: 'POST',
-      url: '/api/mandelbrot',
-      data: inputData,
-      success: mandelbrotInputSuccessHandler,
-      error: mandelbrotInputErrorHandler
-    });
-  });
-
-  function mandelbrotInputSuccessHandler (data) {
-    window.mandelbrot = data;
-  }
-
-  function mandelbrotInputErrorHandler (error) {
-    console.log(error);
-  }
-
-
+  require('./click-cool-pts-btns.js');
+  require('./click-mandelbrot.js');
+  require('./draw-mandelbrot.js');
+  require('./submit-mandelbrot-form.js');
 });
