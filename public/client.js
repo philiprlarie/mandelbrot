@@ -1,6 +1,6 @@
 $(function () {
-  require('./click-cool-pts-btns.js');
-  require('./click-mandelbrot.js');
-  require('./draw-mandelbrot.js');
-  require('./submit-mandelbrot-form.js');
+  require('./clientJS/click-cool-pts-btns.js');
+  require('./clientJS/click-mandelbrot.js');
+  require('./clientJS/draw-mandelbrot.js');
+  require('./clientJS/submit-mandelbrot-form.js');
 });
