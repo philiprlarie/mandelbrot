@@ -9,7 +9,7 @@ function drawMandelbrot (mandelbrot, canvas, opts) {
   var id = ctx.createImageData(width, height);
   var d = id.data;
 
-  var escapeVals = [].concat.apply([], mandelbrot.grid);
+  var escapeVals = [].concat.apply([], mandelbrot.smoothEscapeValsGrid);
   escapeVals.sort(function (a, b) { return a - b; });
   colorVals = new Array(256);
   var k = 0, idx;
@@ -23,12 +23,8 @@ function drawMandelbrot (mandelbrot, canvas, opts) {
   while (i < width) {
     j = 0;
     while (j < height) {
-      escapeNum = mandelbrot.grid[j][i];
+      escapeNum = mandelbrot.smoothEscapeValsGrid[j][i];
       pixelNum = i + j * width;
-      d[4 * pixelNum + 0] = 0;
-      d[4 * pixelNum + 1] = 0;
-      d[4 * pixelNum + 2] = 0;
-
       k = 0;
       while (k < 256) {
         if (colorVals[k] < escapeNum ) {
@@ -37,13 +33,18 @@ function drawMandelbrot (mandelbrot, canvas, opts) {
           break;
         }
       }
-      d[4 * pixelNum + 3] = k;
+      d[4 * pixelNum + 0] = k;
+      d[4 * pixelNum + 1] = k;
+      d[4 * pixelNum + 2] = k;
+      d[4 * pixelNum + 3] = 255;
 
       j++;
     }
     i++;
   }
 
+  canvas.width = width;
+  canvas.height = height;
   ctx.putImageData(id, 0, 0);
   var t2 = new Date();
   console.log('Done. ' + (t2 - t1) / 1000 + ' seconds.');

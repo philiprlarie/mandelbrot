@@ -9852,7 +9852,7 @@ $(function () {
   require('./clientJS/submit-mandelbrot-form.js');
 });
 
-},{"./clientJS/click-cool-pts-btns.js":3,"./clientJS/click-mandelbrot.js":4,"./clientJS/draw-mandelbrot.js":7,"./clientJS/submit-mandelbrot-form.js":8,"jquery":1}],3:[function(require,module,exports){
+},{"./clientJS/click-cool-pts-btns.js":3,"./clientJS/click-mandelbrot.js":4,"./clientJS/draw-mandelbrot.js":10,"./clientJS/submit-mandelbrot-form.js":11,"jquery":1}],3:[function(require,module,exports){
 var $ = require('jquery');
 
 $('button[name=cool-pt-1]').click(function (e) {
@@ -9893,6 +9893,257 @@ $('#canvas').click(function (e) {
 module.exports = {};
 
 },{"jquery":1}],5:[function(require,module,exports){
+// bands by number of pixels. Linear gradient by total number of iterations
+function drawMandelbrot (mandelbrot, canvas, opts) {
+  var i, j;
+
+  console.log('Drawing Mandelbrot...');
+  var t1 = new Date();
+
+  var width = mandelbrot.width;
+  var height = mandelbrot.height;
+  var numPixels = width * height;
+  var iterations = mandelbrot.iterations;
+  var escapeVals = [].concat.apply([], mandelbrot.escapeValsGrid);
+
+  // create histogram of escape values. a value of Infinity -> iterations
+  var escapeHistogram = Array.apply(null, Array(iterations + 1)).map(Number.prototype.valueOf, 0);
+  i = 0;
+  var escapeVal;
+  while (i < escapeVals.length) {
+    escapeVal = escapeVals[i] === Infinity ? iterations : escapeVals[i];
+    escapeHistogram[escapeVal] += 1;
+    i++;
+  }
+  console.log(escapeHistogram);
+
+  // find indecies on escapeHistogram that correspond to split points
+  var bandSplitIndecies = new Array(opts.bandSplitPercents.length);
+  i = 0;
+  var total = 0;
+  var index = 0;
+  while (i < bandSplitIndecies.length) {
+    while (total / numPixels <= opts.bandSplitPercents[i] && index < escapeHistogram.length) {
+      total += escapeHistogram[index];
+      index++;
+    }
+    bandSplitIndecies[i] = index - 1;
+    i++;
+  }
+  bandSplitIndecies.unshift(0);
+  bandSplitIndecies.push(escapeHistogram.length);
+
+  // create color percent tables (each escape value corresponds to a percentage of color change based on its position in its respective band)
+  // bandSplitPercent = [.10, .50, .80];
+  // escapeHistogram = [5, 5, 10, 50, 10, 10, 10];
+  // bandSplitIndecies  *     *       *   *      *
+  var percentColorTable = new Array(escapeHistogram.length);
+  var totalIterationsInBand;
+  var iterationsInBandSoFar;
+  var bandStartIndex = 0;
+  while (bandStartIndex < bandSplitIndecies.length - 1) {
+  // for every band do the following
+    totalIterationsInBand = 0;
+    i = bandSplitIndecies[bandStartIndex];
+    while (i < bandSplitIndecies[bandStartIndex + 1]) {
+      totalIterationsInBand += escapeHistogram[i] * i;
+      i++;
+    }
+    iterationsInBandSoFar = 0;
+    i = bandSplitIndecies[bandStartIndex];
+    while (i < bandSplitIndecies[bandStartIndex + 1]) {
+      percentColorTable[i] = iterationsInBandSoFar / totalIterationsInBand;
+      iterationsInBandSoFar += escapeHistogram[i] * i;
+      i++;
+    }
+    bandStartIndex++;
+  }
+
+  // create table that relates iteration value to RGBA value
+  var colorTable = new Array(escapeHistogram.length);
+  var startR, startG, startB, startA, endR, endG, endB, endA, delR, delG, delB, delA, currentRGBA;
+  var bandStartIndex = 0; // jshint ignore:line
+  while (bandStartIndex < bandSplitIndecies.length - 1) {
+  // for every band do the following
+    startR = opts.startColors[bandStartIndex][0];
+    startG = opts.startColors[bandStartIndex][1];
+    startB = opts.startColors[bandStartIndex][2];
+    startA = opts.startColors[bandStartIndex][3];
+    endR = opts.endColors[bandStartIndex][0];
+    endG = opts.endColors[bandStartIndex][1];
+    endB = opts.endColors[bandStartIndex][2];
+    endA = opts.endColors[bandStartIndex][3];
+    delR = endR - startR;
+    delG = endG - startG;
+    delB = endB - startB;
+    delA = endA - startA;
+    i = bandSplitIndecies[bandStartIndex];
+    while (i < bandSplitIndecies[bandStartIndex + 1]) {
+      currentRGBA = [];
+      currentRGBA[0] = startR + delR * percentColorTable[i];
+      currentRGBA[1] = startG + delG * percentColorTable[i];
+      currentRGBA[2] = startB + delB * percentColorTable[i];
+      currentRGBA[3] = startA + delA * percentColorTable[i];
+      colorTable[i] = currentRGBA;
+      i++;
+    }
+    bandStartIndex++;
+  }
+
+  // set pixels to have correct colors based on escape value and color table
+  var ctx = canvas.getContext('2d');
+  var id = ctx.createImageData(width, height);
+  var d = id.data;
+  var escapeNum, pixelNum;
+  i = 0;
+  while (i < width) {
+    j = 0;
+    while (j < height) {
+      pixelNum = i + width * j;
+      escapeNum = mandelbrot.escapeValsGrid[j][i];
+      escapeNum = escapeNum === Infinity ? iterations : escapeNum;
+      d[4 * pixelNum + 0] = colorTable[escapeNum][0];
+      d[4 * pixelNum + 1] = colorTable[escapeNum][1];
+      d[4 * pixelNum + 2] = colorTable[escapeNum][2];
+      d[4 * pixelNum + 3] = colorTable[escapeNum][3];
+      j++;
+    }
+    i++;
+  }
+
+  ctx.putImageData(id, 0, 0);
+  var t2 = new Date();
+  console.log('Done. ' + (t2 - t1) / 1000 + ' seconds.');
+}
+
+module.exports = drawMandelbrot;
+
+},{}],6:[function(require,module,exports){
+// // bands by number of pixels. Linear gradient by number of pixel
+function drawMandelbrot (mandelbrot, canvas, opts) {
+  var i, j;
+
+  console.log('Drawing Mandelbrot...');
+  var t1 = new Date();
+
+  var width = mandelbrot.width;
+  var height = mandelbrot.height;
+  var numPixels = width * height;
+  var iterations = mandelbrot.iterations;
+  var escapeVals = [].concat.apply([], mandelbrot.escapeValsGrid);
+
+  // create histogram of escape values. a value of Infinity -> iterations
+  var escapeHistogram = Array.apply(null, Array(iterations + 1)).map(Number.prototype.valueOf, 0);
+  i = 0;
+  var escapeVal;
+  while (i < escapeVals.length) {
+    escapeVal = escapeVals[i] === Infinity ? iterations : escapeVals[i];
+    escapeHistogram[escapeVal] += 1;
+    i++;
+  }
+
+  // find indecies on escapeHistogram that correspond to split points
+  var bandSplitIndecies = new Array(opts.bandSplitPercents.length);
+  i = 0;
+  var total = 0;
+  var index = 0;
+  while (i < bandSplitIndecies.length) {
+    while (total / numPixels <= opts.bandSplitPercents[i] && index < escapeHistogram.length) {
+      total += escapeHistogram[index];
+      index++;
+    }
+    bandSplitIndecies[i] = index - 1;
+    i++;
+  }
+  bandSplitIndecies.unshift(0);
+  bandSplitIndecies.push(escapeHistogram.length);
+
+  // create color percent tables (each escape value corresponds to a percentage of color change based on its position in its respective band)
+  // bandSplitPercent = [.10, .50, .80];
+  // escapeHistogram = [5, 5, 10, 50, 10, 10, 10];
+  // bandSplitIndecies  *     *       *   *      *
+  var percentColorTable = new Array(escapeHistogram.length);
+  var totalPixelsInBand;
+  var pixelsInBandSoFar;
+  var bandStartIndex = 0;
+  while (bandStartIndex < bandSplitIndecies.length - 1) {
+  // for every band do the following
+    totalPixelsInBand = 0;
+    i = bandSplitIndecies[bandStartIndex];
+    while (i < bandSplitIndecies[bandStartIndex + 1]) {
+      totalPixelsInBand += escapeHistogram[i];
+      i++;
+    }
+    pixelsInBandSoFar = 0;
+    i = bandSplitIndecies[bandStartIndex];
+    while (i < bandSplitIndecies[bandStartIndex + 1]) {
+      percentColorTable[i] = pixelsInBandSoFar / totalPixelsInBand;
+      pixelsInBandSoFar += escapeHistogram[i];
+      i++;
+    }
+    bandStartIndex++;
+  }
+
+  // create table that relates iteration value to RGBA value
+  var colorTable = new Array(escapeHistogram.length);
+  var startR, startG, startB, startA, endR, endG, endB, endA, delR, delG, delB, delA, currentRGBA;
+  var bandStartIndex = 0; // jshint ignore:line
+  while (bandStartIndex < bandSplitIndecies.length - 1) {
+  // for every band do the following
+    startR = opts.startColors[bandStartIndex][0];
+    startG = opts.startColors[bandStartIndex][1];
+    startB = opts.startColors[bandStartIndex][2];
+    startA = opts.startColors[bandStartIndex][3];
+    endR = opts.endColors[bandStartIndex][0];
+    endG = opts.endColors[bandStartIndex][1];
+    endB = opts.endColors[bandStartIndex][2];
+    endA = opts.endColors[bandStartIndex][3];
+    delR = endR - startR;
+    delG = endG - startG;
+    delB = endB - startB;
+    delA = endA - startA;
+    i = bandSplitIndecies[bandStartIndex];
+    while (i < bandSplitIndecies[bandStartIndex + 1]) {
+      currentRGBA = [];
+      currentRGBA[0] = startR + delR * percentColorTable[i];
+      currentRGBA[1] = startG + delG * percentColorTable[i];
+      currentRGBA[2] = startB + delB * percentColorTable[i];
+      currentRGBA[3] = startA + delA * percentColorTable[i];
+      colorTable[i] = currentRGBA;
+      i++;
+    }
+    bandStartIndex++;
+  }
+
+  // set pixels to have correct colors based on escape value and color table
+  var ctx = canvas.getContext('2d');
+  var id = ctx.createImageData(width, height);
+  var d = id.data;
+  var escapeNum, pixelNum;
+  i = 0;
+  while (i < width) {
+    j = 0;
+    while (j < height) {
+      pixelNum = i + width * j;
+      escapeNum = mandelbrot.escapeValsGrid[j][i];
+      escapeNum = escapeNum === Infinity ? iterations : escapeNum;
+      d[4 * pixelNum + 0] = colorTable[escapeNum][0];
+      d[4 * pixelNum + 1] = colorTable[escapeNum][1];
+      d[4 * pixelNum + 2] = colorTable[escapeNum][2];
+      d[4 * pixelNum + 3] = colorTable[escapeNum][3];
+      j++;
+    }
+    i++;
+  }
+
+  ctx.putImageData(id, 0, 0);
+  var t2 = new Date();
+  console.log('Done. ' + (t2 - t1) / 1000 + ' seconds.');
+}
+
+module.exports = drawMandelbrot;
+
+},{}],7:[function(require,module,exports){
 // black on white based on linear gradient of escape num
 function drawMandelbrot (mandelbrot, canvas, opts) {
   console.log('Drawing Mandelbrot...');
@@ -9908,18 +10159,20 @@ function drawMandelbrot (mandelbrot, canvas, opts) {
   while (i < width) {
     j = 0;
     while (j < height) {
-      escapeNum = mandelbrot.grid[j][i];
+      escapeNum = mandelbrot.smoothEscapeValsGrid[j][i];
       pixelNum = i + j * width;
 
-      d[4 * pixelNum + 0] = 0;
-      d[4 * pixelNum + 1] = 0;
-      d[4 * pixelNum + 2] = 0;
-      d[4 * pixelNum + 3] = 255 * escapeNum;
+      d[4 * pixelNum + 0] = 255 * escapeNum;
+      d[4 * pixelNum + 1] = 255 * escapeNum;
+      d[4 * pixelNum + 2] = 255 * escapeNum;
+      d[4 * pixelNum + 3] = 255;
       j++;
     }
     i++;
   }
 
+  canvas.width = width;
+  canvas.height = height;
   ctx.putImageData(id, 0, 0);
   var t2 = new Date();
   console.log('Done. ' + (t2 - t1) / 1000 + ' seconds.');
@@ -9927,7 +10180,62 @@ function drawMandelbrot (mandelbrot, canvas, opts) {
 
 module.exports = drawMandelbrot;
 
-},{}],6:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
+// scaling with 256 bins
+function drawMandelbrot (mandelbrot, canvas, opts) {
+  console.log('Drawing Mandelbrot...');
+  var t1 = new Date();
+
+  var width = mandelbrot.width;
+  var height = mandelbrot.height;
+  var ctx = canvas.getContext('2d');
+  var id = ctx.createImageData(width, height);
+  var d = id.data;
+
+  var escapeVals = [].concat.apply([], mandelbrot.smoothEscapeValsGrid);
+  escapeVals.sort(function (a, b) { return a - b; });
+  colorVals = new Array(256);
+  var k = 0, idx;
+  while (k < 256) {
+    idx = Math.floor(width * height / 256 * k);
+    colorVals[k] = escapeVals[idx];
+    k++;
+  }
+
+  var i = 0, j, pixelNum, escapeNum;
+  while (i < width) {
+    j = 0;
+    while (j < height) {
+      escapeNum = mandelbrot.smoothEscapeValsGrid[j][i];
+      pixelNum = i + j * width;
+      k = 0;
+      while (k < 256) {
+        if (colorVals[k] < escapeNum ) {
+          k++;
+        } else {
+          break;
+        }
+      }
+      d[4 * pixelNum + 0] = k;
+      d[4 * pixelNum + 1] = k;
+      d[4 * pixelNum + 2] = k;
+      d[4 * pixelNum + 3] = 255;
+
+      j++;
+    }
+    i++;
+  }
+
+  canvas.width = width;
+  canvas.height = height;
+  ctx.putImageData(id, 0, 0);
+  var t2 = new Date();
+  console.log('Done. ' + (t2 - t1) / 1000 + ' seconds.');
+}
+
+module.exports = drawMandelbrot;
+
+},{}],9:[function(require,module,exports){
 // white on black based on linear gradient of escape num
 function drawMandelbrot (mandelbrot, canvas, opts) {
   console.log('Drawing Mandelbrot...');
@@ -9943,7 +10251,7 @@ function drawMandelbrot (mandelbrot, canvas, opts) {
   while (i < width) {
     j = 0;
     while (j < height) {
-      escapeNum = mandelbrot.grid[j][i];
+      escapeNum = mandelbrot.smoothEscapeValsGrid[j][i];
       pixelNum = i + j * width;
 
       d[4 * pixelNum + 0] = 255 - 255 * escapeNum;
@@ -9964,58 +10272,51 @@ function drawMandelbrot (mandelbrot, canvas, opts) {
 
 module.exports = drawMandelbrot;
 
-},{}],7:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 var $ = require('jquery');
 var whiteOnBlack = require('./draw-mandelbrot-styles/white-on-black.js');
 var blackOnWhite = require('./draw-mandelbrot-styles/black-on-white.js');
+var simpleHistogram = require('./draw-mandelbrot-styles/simple-histogram.js');
+var bandsByPixels = require('./draw-mandelbrot-styles/bands-by-pixels.js');
+var bandsByIterations = require('./draw-mandelbrot-styles/bands-by-iterations.js');
 
 function drawMandelbrot () {
   var canvas = $('#canvas')[0];
-  //
-  // var x = parseFloat($('#mandelbrot-input input[name=centerX]').val());
-  // var y = parseFloat($('#mandelbrot-input input[name=centerY]').val());
-  // var zoom = parseFloat($('#mandelbrot-input input[name=zoom]').val());
-  // var iters = parseInt($('#mandelbrot-input input[name=iterations]').val());
-  // var width = canvas.width = parseInt($('#mandelbrot-input input[name=width]').val());
-  // var height = canvas.height = parseInt($('#mandelbrot-input input[name=height]').val());
 
-
-  opts = {};
-  // console.log('Calculating Mandelbrot...');
-  // var t1 = new Date();
-  // window.mandelbrot = new Mandelbrot(x, y, width, height, zoom, iters);
-  // var t2 = new Date();
-  // console.log('Done. ' + (t2 - t1) / 1000 + ' seconds.');
-
-  whiteOnBlack(window.mandelbrot, canvas, opts);
+  // opts = {};
+  // test options
+  var bandSplitPercents = $.map($('#drawing-options input[name=bandSplitPercents]').val().split(' '), parseFloat);
+  var opts = {
+    bandTypes: 'percentage',
+    numBands: 5,
+    bandSplitPercents: bandSplitPercents,
+    startColors: [
+      [0, 0, 0, 255],
+      [255, 0, 0, 255],
+      [0, 255, 0, 255],
+      [0, 0, 255, 255],
+      [255, 255, 0, 255]
+    ],
+    endColors: [
+      [255, 0, 0, 255],
+      [0, 255, 0, 255],
+      [0, 0, 255, 255],
+      [255, 255, 0, 255],
+      [255, 0, 255, 255]
+    ],
+  };
+  // end test options
+  // blackOnWhite(window.mandelbrot, canvas, opts);
+  // whiteOnBlack(window.mandelbrot, canvas, opts);
+  // simpleHistogram(window.mandelbrot, canvas, opts);
+  // bandsByPixels(window.mandelbrot, canvas, opts);
+  bandsByIterations(window.mandelbrot, canvas, opts);
 }
 
-// // test options
-// var bandSplitPercents = $.map($('#drawing-options input[name=bandSplitPercents]').val().split(' '), parseFloat);
-// var opts = {
-//   bandTypes: 'percentage',
-//   numBands: 5,
-//   bandSplitPercents: bandSplitPercents,
-//   startColors: [
-//     [0, 0, 0, 255],
-//     [255, 0, 0, 255],
-//     [0, 255, 0, 255],
-//     [0, 0, 255, 255],
-//     [255, 255, 0, 255]
-//   ],
-//   endColors: [
-//     [255, 0, 0, 255],
-//     [0, 255, 0, 255],
-//     [0, 0, 255, 255],
-//     [255, 255, 0, 255],
-//     [255, 0, 255, 255]
-//   ],
-// };
-// end test options
 
 module.exports = drawMandelbrot;
 
-},{"./draw-mandelbrot-styles/black-on-white.js":5,"./draw-mandelbrot-styles/white-on-black.js":6,"jquery":1}],8:[function(require,module,exports){
+},{"./draw-mandelbrot-styles/bands-by-iterations.js":5,"./draw-mandelbrot-styles/bands-by-pixels.js":6,"./draw-mandelbrot-styles/black-on-white.js":7,"./draw-mandelbrot-styles/simple-histogram.js":8,"./draw-mandelbrot-styles/white-on-black.js":9,"jquery":1}],11:[function(require,module,exports){
 var $ = require('jquery');
 var drawMandelbrot = require('./draw-mandelbrot.js');
 
@@ -10044,4 +10345,4 @@ function mandelbrotInputErrorHandler (error) {
 
 module.exports = {};
 
-},{"./draw-mandelbrot.js":7,"jquery":1}]},{},[2]);
+},{"./draw-mandelbrot.js":10,"jquery":1}]},{},[2]);

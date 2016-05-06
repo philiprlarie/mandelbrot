@@ -9,7 +9,7 @@ function drawMandelbrot (mandelbrot, canvas, opts) {
   var height = mandelbrot.height;
   var numPixels = width * height;
   var iterations = mandelbrot.iterations;
-  var escapeVals = [].concat.apply([], mandelbrot.grid);
+  var escapeVals = [].concat.apply([], mandelbrot.escapeValsGrid);
 
   // create histogram of escape values. a value of Infinity -> iterations
   var escapeHistogram = Array.apply(null, Array(iterations + 1)).map(Number.prototype.valueOf, 0);
@@ -104,7 +104,7 @@ function drawMandelbrot (mandelbrot, canvas, opts) {
     j = 0;
     while (j < height) {
       pixelNum = i + width * j;
-      escapeNum = mandelbrot.grid[j][i];
+      escapeNum = mandelbrot.escapeValsGrid[j][i];
       escapeNum = escapeNum === Infinity ? iterations : escapeNum;
       d[4 * pixelNum + 0] = colorTable[escapeNum][0];
       d[4 * pixelNum + 1] = colorTable[escapeNum][1];
@@ -119,3 +119,5 @@ function drawMandelbrot (mandelbrot, canvas, opts) {
   var t2 = new Date();
   console.log('Done. ' + (t2 - t1) / 1000 + ' seconds.');
 }
+
+module.exports = drawMandelbrot;

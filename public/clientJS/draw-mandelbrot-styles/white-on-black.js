@@ -13,7 +13,7 @@ function drawMandelbrot (mandelbrot, canvas, opts) {
   while (i < width) {
     j = 0;
     while (j < height) {
-      escapeNum = mandelbrot.grid[j][i];
+      escapeNum = mandelbrot.smoothEscapeValsGrid[j][i];
       pixelNum = i + j * width;
 
       d[4 * pixelNum + 0] = 255 - 255 * escapeNum;

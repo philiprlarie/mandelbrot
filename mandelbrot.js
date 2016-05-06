@@ -14,10 +14,13 @@ function Mandelbrot (centerX, centerY, width, height, zoom, iterations) {
     i++;
   }
 
-  this.grid = new Array(this.height); // grid of mandelbrot escape values
+  // grids of mandelbrot escape values
+  this.escapeValsGrid = new Array(this.height); // integers
+  this.smoothEscapeValsGrid = new Array(this.height); // floats
   i = 0;
   while (i < this.height) {
-    this.grid[i] = new Array(this.width);
+    this.escapeValsGrid[i] = new Array(this.width);
+    this.smoothEscapeValsGrid[i] = new Array(this.width);
     i++;
   }
 
@@ -44,13 +47,15 @@ var setPointValues = function (mandelbrot) {
 
 // set each spot on grid as mandelbrot escape count
 var setMandelbrotValues = function (mandelbrot) {
-  var i, j;
+  var i, j, escapeVals;
 
   i = 0;
   while (i < mandelbrot.width) {
     j = 0;
     while (j < mandelbrot.height) {
-      mandelbrot.grid[j][i] = mandelbrotIterate(mandelbrot.coordGrid[j][i], mandelbrot.iterations);
+      escapeVals = mandelbrotIterate(mandelbrot.coordGrid[j][i], mandelbrot.iterations);
+      mandelbrot.escapeValsGrid[j][i] = escapeVals[0];
+      mandelbrot.smoothEscapeValsGrid[j][i] = escapeVals[1];
       j++;
     }
     i++;
@@ -58,33 +63,11 @@ var setMandelbrotValues = function (mandelbrot) {
 };
 
 // Given a point, iterate the mandelbrot function until point has magnitude > 2 or max iterations. If we meet max itarations, assume point will never escape
-
-// simple escape calculation
-// var mandelbrotIterate = function (point, maxIterations) {
-//   var escapeRadius = 2;
-//   var startReal = point[0];
-//   var startImaginary = point[1];
-//   var real = 0;
-//   var imaginary = 0;
-//
-//   var i = 0;
-//   while (i < maxIterations) {
-//     tempReal = startReal + real * real - imaginary * imaginary;
-//     tempImaginary = startImaginary + 2 * real * imaginary;
-//     real = tempReal;
-//     imaginary = tempImaginary;
-//
-//     if (real * real + imaginary * imaginary > escapeRadius * escapeRadius) {
-//       return i;
-//     }
-//     i++;
-//   }
-//   return Infinity;
-// };
-
 // smooth escape calculation
 var mandelbrotIterate = function (point, maxIterations) {
-  var escapeRadius = 20000;
+  var escapeVals = [-1, -1];
+  var escapeRadius = 2;
+  var largeEscapeRadius = 20000;
   var startReal = point[0];
   var startImaginary = point[1];
   var real = 0;
@@ -93,20 +76,38 @@ var mandelbrotIterate = function (point, maxIterations) {
   var tempReal, tempImaginary;
   var i = 0;
   while (i < maxIterations) {
+    // discrete escapeVal
+    if (escapeVals[0] < 0 && real * real + imaginary * imaginary > escapeRadius * escapeRadius) {
+      escapeVals[0] = i;
+    }
+    // continuous escapeVal
+    if (real * real + imaginary * imaginary > largeEscapeRadius * largeEscapeRadius) {
+      break;
+    }
+    // both
     tempReal = startReal + real * real - imaginary * imaginary;
     tempImaginary = startImaginary + 2 * real * imaginary;
     real = tempReal;
     imaginary = tempImaginary;
 
-    if (real * real + imaginary * imaginary > escapeRadius * escapeRadius) {
-      break;
-    }
     i++;
   }
 
-  if (real * real + imaginary * imaginary < 2 * 2 * 2 * 2) { return 0; }
-  var mu = (i - Math.log(Math.log(real * real + imaginary * imaginary) / 2) / Math.log(2)) / maxIterations;
-  return Math.sqrt(mu);
+  // TODO: infinity over json
+  // discrete escapeVal
+  if (escapeVals[0] < 0) {
+    escapeVals[0] = maxIterations;
+  }
+  //continuous escapeVal
+  if (real * real + imaginary * imaginary < 2 * 2 * 2 * 2) {
+    escapeVals[1] = maxIterations;
+  } else {
+    // TODO: check this math
+    var mu = (i - Math.log(Math.log(real * real + imaginary * imaginary) / 2) / Math.log(2)) / maxIterations;
+    escapeVals[1] = Math.sqrt(mu);
+  }
+
+  return escapeVals;
 };
 
 module.exports = Mandelbrot;
