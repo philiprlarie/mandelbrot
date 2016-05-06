@@ -1,3 +1,6 @@
+var $ = require('jquery');
+var drawMandelbrot = require('./draw-mandelbrot.js');
+
 $('#mandelbrot-input').on('submit', function (event) {
   event.preventDefault();
   var $form = $(this);
@@ -14,6 +17,7 @@ $('#mandelbrot-input').on('submit', function (event) {
 
 function mandelbrotInputSuccessHandler (data) {
   window.mandelbrot = data;
+  drawMandelbrot();
 }
 
 function mandelbrotInputErrorHandler (error) {

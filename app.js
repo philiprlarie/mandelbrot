@@ -8,14 +8,15 @@ app.use(express.static('public'));
 app.post('/api/mandelbrot', parseUrlEncoded, function (req, res) {
   // TODO: Form validator
   var input = req.body;
-  res.json(new Mandelbrot(
-    input.centerX,
-    input.centerY,
-    input.width,
-    input.height,
-    input.zoom,
-    input.iterations
-  ));
+  var returnMandelbrot = new Mandelbrot(
+    parseFloat(input.centerX),
+    parseFloat(input.centerY),
+    parseInt(input.width),
+    parseInt(input.height),
+    parseFloat(input.zoom),
+    parseInt(input.iterations)
+  );
+  res.json(returnMandelbrot);
 });
 
 app.listen(8000, function () {

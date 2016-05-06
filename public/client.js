@@ -1,3 +1,5 @@
+var $ = require('jquery');
+
 $(function () {
   require('./clientJS/click-cool-pts-btns.js');
   require('./clientJS/click-mandelbrot.js');
