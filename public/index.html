@@ -8,36 +8,62 @@
   </head>
 
   <body>
-    <div class="presets">
+
+    <div class="presets container">
       <h3>Checkout Some Cool Places</h3>
       <button type="button" name="cool-pt-1">Spirals</button>
+      <button type="button" name="cool-pt-2">Mini Mandelbrot</button>
     </div>
 
-    <h3>Or explore for yourself!</h3>
-    <form id="mandelbrot-input">
-      Center X:
-      <input type="text" name="centerX" value="-0.75"><br/>
-      Center Y:
-      <input type="text" name="centerY" value="0"><br/>
-      Width:
-      <input type="text" name="width" value="150"><br/>
-      Height:
-      <input type="text" name="height" value="150"><br/>
-      Zoom:
-      <input type="text" name="zoom" value="1"><br/>
-      Iterations:
-      <input type="text" name="iterations" value="50"><br/>
-      <input type="submit">
-    </form>
+    <div class="mandelbrot-input container">
+      <h3>Or explore for yourself!</h3>
+      <form id="mandelbrot-input">
+        <fieldset class="form-group">
+          <label>Center X:
+            <input type="number" class="form-control" name="centerX" value="-0.75" step="any">
+          </label>
+          <label>Center Y:
+            <input type="number" class="form-control" name="centerY" value="0" step="any">
+          </label>
+          <label>Zoom:
+            <input type="number" class="form-control" name="zoom" value="0.5" step="any">
+          </label>
+          <label>Iterations:
+            <input type="number" class="form-control" name="iterations" value="50" step="1">
+          </label>
+        </fieldset>
 
-    <h3>Drawing Options</h3>
-    <form id="drawing-options">
-      Sharpness:
-      <input type="text" name="sharpness" value="2"><br/>
-      Band Splits (Percent of pixels):
-      <input type="text" name="bandSplitPercents" value="0.2 0.4 0.6 0.8"><br/>
-      <input type="submit">
-    </form>
+        <fieldset class="form-group">
+          <label>Width (pixels):
+            <input type="number" class="form-control" name="width" value="500" step="1">
+          </label>
+          <label>Height (pixels):
+            <input type="number" class="form-control" name="height" value="500" step="1">
+          </label>
+        </fieldset>
+        <input type="submit">
+      </form>
+    </div>
+
+    <div class="drawing-options container">
+      <h3>Drawing Options</h3>
+      <form id="drawing-options">
+        <label>Number of Bands
+          <select class="form-control" name="numBands">
+            <option>1</option>
+            <option>2</option>
+            <option>3</option>
+            <option>4</option>
+            <option selected="selected">5</option>
+          </select>
+        </label>
+        <label>Band Splits (%):
+          <input class="form-control" type="text" name="bandSplitPercents" value="20 40 60 80">
+        </label>
+        <input type="submit">
+      </form>
+    </div>
+
 
     <canvas id="canvas" width="500" height="500"></canvas>
 

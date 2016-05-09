@@ -7,3 +7,7 @@ The iteration option can cause an increase in rendering time as well. You will n
 Click the image to move where it is centered. Click while holding shift to zoom in. Click while holding ctrl to zoom out.
 
 Mess around and see what you can find.
+
+
+Input
+bandSplitPercents is an array of floats from 0 to 100. You don't need to include 0 or 100, those get added for you. The bandSplitPercents are only the middle ones. E.g. If there are 3 bands, there are 2 splits. 

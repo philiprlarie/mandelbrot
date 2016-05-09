@@ -17,7 +17,7 @@ $('#mandelbrot-input').on('submit', function (event) {
 
 function mandelbrotInputSuccessHandler (data) {
   window.mandelbrot = data;
-  drawMandelbrot();
+  $('#drawing-options').submit();
 }
 
 function mandelbrotInputErrorHandler (error) {

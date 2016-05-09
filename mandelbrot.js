@@ -103,8 +103,8 @@ var mandelbrotIterate = function (point, maxIterations) {
     escapeVals[1] = maxIterations;
   } else {
     // TODO: check this math
-    var mu = (i - Math.log(Math.log(real * real + imaginary * imaginary) / 2) / Math.log(2)) / maxIterations;
-    escapeVals[1] = Math.sqrt(mu);
+    var mu = i + 1 - Math.log(Math.log(real * real + imaginary * imaginary) / 2) / Math.log(2);
+    escapeVals[1] = mu > maxIterations ? maxIterations : mu;
   }
 
   return escapeVals;
