@@ -2,12 +2,19 @@ body {
   background-color: black;
   color: grey;
   padding-left: 100px;
-  padding-top: 100px;
+  /*padding-top: 100px;*/
 }
 
-.container {
+.my-container {
   margin: 50px 0;
-  padding: 40px;
+  padding: 15px 20px;
   background: #222;
   border-radius: 10px;
+  width: 500px;
+}
+
+#canvas {
+  float: right;
+  margin-right: 160px;
+  margin-top: 80px;
 }

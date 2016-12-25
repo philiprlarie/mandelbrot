@@ -13,13 +13,21 @@ function drawMandelbrot (canvas, opts) {
 
   console.log('Drawing Mandelbrot...');
   var t1 = new Date();
-  // blackOnWhite(mandelbrot, canvas, opts);
-  // whiteOnBlack(mandelbrot, canvas, opts);
-  smoothBands(mandelbrot, canvas, opts);
-  // simpleHistogram(mandelbrot, canvas, opts);
-  // bandsByPixels(mandelbrot, canvas, opts);
-  // bandsByPixels(mandelbrot, canvas, opts);
 
+  // switch (expression) {
+  //   case expression:
+  //
+  //     break;
+  //   default:
+  //
+  // }
+
+  blackOnWhite(mandelbrot, canvas, opts);
+  // whiteOnBlack(mandelbrot, canvas, opts);
+  // smoothBands(mandelbrot, canvas, opts);
+  simpleHistogram(mandelbrot, canvas, opts);
+  // bandsByPixels(mandelbrot, canvas, opts);
+  // bandsByPixels(mandelbrot, canvas, opts);
 
   var t2 = new Date();
   console.log('Done. ' + (t2 - t1) / 1000 + ' seconds.');

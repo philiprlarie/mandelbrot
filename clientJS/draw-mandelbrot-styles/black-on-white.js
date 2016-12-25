@@ -16,9 +16,9 @@ function drawMandelbrot (mandelbrot, canvas, opts) {
       escapeNum = mandelbrot.smoothEscapeValsGrid[j][i];
       pixelNum = i + j * width;
 
-      d[4 * pixelNum + 0] = 255 * escapeNum;
-      d[4 * pixelNum + 1] = 255 * escapeNum;
-      d[4 * pixelNum + 2] = 255 * escapeNum;
+      d[4 * pixelNum + 0] = 255 * escapeNum / mandelbrot.iterations;
+      d[4 * pixelNum + 1] = 255 * escapeNum / mandelbrot.iterations;
+      d[4 * pixelNum + 2] = 255 * escapeNum / mandelbrot.iterations;
       d[4 * pixelNum + 3] = 255;
       j++;
     }

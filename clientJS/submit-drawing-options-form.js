@@ -5,10 +5,10 @@ $('#drawing-options').on('submit', function (event) {
   event.preventDefault();
   var $form = $(this);
 
-  // opts = {};
-  // test options
   var numBands = parseInt($form.find('select[name=numBands]').val());
   var bandSplitPercents = $.map($form.find('input[name=bandSplitPercents]').val().split(' '), parseFloat);
+
+  
   var opts = {
     numBands: numBands,
     bandSplitPercents: bandSplitPercents,
